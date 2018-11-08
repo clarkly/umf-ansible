@@ -1,0 +1,18 @@
+---
+- include: "install.yml"
+
+- include: megacli.yml
+  tags: megacli
+  when: inventory_hostname in groups['physical']
+
+- include: inspur.physical.yml
+  tags: ipmitool
+  when: (inventory_hostname in groups['physical'] and 'NF' in ansible_product_name)
+
+- include: dell.physical.yml
+  tags: racadm
+  when: (inventory_hostname in groups['physical'] and 'PowerEdge' in ansible_product_name)
+
+- include: enthernet.yml
+  tags: ethernet
+  when: inventory_hostname in groups['physical']

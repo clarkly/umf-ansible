@@ -1,0 +1,14 @@
+#!/bin/bash
+# use megacli to check hard disk status
+# Date: 2017.06.20
+
+RESULT=`MegaCli64  -PDList -aALL | grep "Slot Number\|Media Error Count\|Other Error Count\|Firmware state" | awk '{if(NR%4!=0)ORS=":";else ORS="\n";print $0}' |awk -F \: '{if($4!=0 || $6!=0 || $8!~/Online|good|JBOD|Hotspare|Rebuild/) print "1";else print "0"}'`
+
+SUM=0
+
+for i in $RESULT
+do
+    SUM=$(($SUM+$i))
+done
+
+echo $SUM

@@ -1,0 +1,6 @@
+- name: install zabbix-agent
+  hosts:
+    - physical
+    - vm
+  roles:
+    - { role: zabbix-agent }

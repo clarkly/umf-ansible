@@ -1,0 +1,54 @@
+---
+- name: create zabbix3.0 yum resource file for version 6
+  copy:
+    content: |
+           [zabbix]
+           name=zabbix
+           baseurl=ftp://yumuser:yumuser@10.10.53.34/yumresource/centos6-zabbix3.0
+           enabled=1
+           gpgcheck=0
+    dest: /etc/yum.repos.d/zabbix3.0.repo
+  when: ansible_distribution_major_version == "6"
+- name: create zabbix-non yum resource file for version 6
+  copy:
+    content: |
+       [zabbix-non]
+       name=zabbix-non
+       baseurl=ftp://yumuser:yumuser@10.10.53.34/yumresource/centos6-zabbix3.0non-supported
+       enabled=1
+       gpgcheck=0
+    dest: /etc/yum.repos.d/zabbix-non.repo
+  when: ansible_distribution_major_version == "6"
+- name: create zabbix 3.0 yum for version 7
+  copy:
+    content: |
+           [zabbix]
+           name=zabbix
+           baseurl=ftp://yumuser:yumuser@10.10.53.34/yumresource/centos7-zabbix3.0
+           enabled=1
+           gpgcheck=0
+    dest: /etc/yum.repos.d/zabbix3.0.repo
+  when: ansible_distribution_major_version == "7"
+- name: create zabbix-non for version 7
+  copy:
+    content: |
+       [zabbix-non]
+       name=zabbix-non
+       baseurl=ftp://yumuser:yumuser@10.10.53.34/yumresource/centos6-zabbix3.0non-supported
+       enabled=1
+       gpgcheck=0
+    dest: /etc/yum.repos.d/zabbix-non.repo
+  when: ansible_distribution_major_version == "7"
+
+- name: install zabbix agent 
+  yum: name=zabbix-agent state=present
+
+- name: copy
+  copy:
+    src: files/zabbix_agentd.conf
+    dest: /etc/zabbix/
+    owner: root
+    mode: 0775
+
+- name: start zabbix service
+  service: name=zabbix-agent enabled=yes state=started

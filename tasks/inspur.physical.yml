@@ -1,0 +1,23 @@
+---
+- name: install ipmitool command
+  yum: name=ipmitool state=present
+
+- name: contab
+  shell: echo "15 * * * * /usr/bin/ipmitool sdr elist >/tmp/inspur.log 2>/dev/null" >> /var/spool/cron/root
+
+- name: copy racadmin zabbix config file
+  copy: 
+    src: files/physical/zabbix-Physical.conf
+    dest: /etc/zabbix/zabbix_agentd.d/zabbix-Physical.conf
+    owner: root
+    mode: 0755
+
+- name: copy physical script
+  copy: 
+    src: files/physical/zabbix-Physical.sh
+    dest: /usr/local/bin/zabbix-Physical.sh
+    owner: root
+    mode: 0755
+
+- name:  restart zabbix agent service
+  service: name=zabbix-agent enabled=yes state=restarted

@@ -1,0 +1,54 @@
+---
+- name: create racadm for version 6
+  copy: 
+    content: |
+        [racadm]
+        name=racadm
+        baseurl=ftp://yumuser:yumuser@10.10.53.34/yumresource/racadm/RHEL6
+        enabled=1
+        gpgcheck=0
+    dest: /etc/yum.repos.d/racadm.repo
+  when: ansible_distribution_major_version == "6"
+
+- name: create racadm for version 7
+  copy: 
+    content: |
+        [racadm]
+        name=racadm
+        baseurl=ftp://yumuser:yumuser@10.10.53.34/yumresource/racadm/RHEL7
+        enabled=1
+        gpgcheck=0
+    dest: /etc/yum.repos.d/racadm.repo
+  when: ansible_distribution_major_version == "7"
+
+- name: yum install command srvadmin
+  yum: name=srvadmin* state=present
+
+- name: create racadm command link
+  file: 
+   src: /opt/dell/srvadmin/sbin/racadm
+   dest: /usr/sbin/racadm
+   owner: root
+   group: root
+   mode: 0755
+   state: link
+
+- name: contab
+  shell: echo "15 * * * * /usr/sbin/racadm getsensorinfo >/tmp/dell.log 2>/dev/null && /usr/sbin/racadm storage get pdisks -o >>/tmp/dell.log 2>/dev/null" >> /var/spool/cron/root
+
+- name: copy racadmin zabbix config file
+  copy: 
+    src: files/physical/zabbix-Physical.conf
+    dest: /etc/zabbix/zabbix_agentd.d/zabbix-Physical.conf
+    owner: root
+    mode: 0755
+
+- name: copy physical script
+  copy: 
+    src: files/physical/zabbix-Physical.sh
+    dest: /usr/local/bin/zabbix-Physical.sh
+    owner: root
+    mode: 0755
+
+- name:  restart zabbix agent service
+  service: name=zabbix-agent enabled=yes state=restarted
