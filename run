@@ -1,0 +1,1 @@
+ansible-playbook -i /etc/ansible/roles/zabbix-agent/hostnode /etc/ansible/roles/zabbix-agent/zabbix-agent.yml -e action=deploy --limit 10.10.38.13
